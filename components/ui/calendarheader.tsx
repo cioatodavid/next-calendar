@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useWeek } from '@/contexts/weekcontext';
+import { useWeek } from '@/contexts/weekContext';
 
 const CalendarHeader = () => {
   const { goToNextWeek, goToPreviousWeek, formattedWeekRange } = useWeek();
