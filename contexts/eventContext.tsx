@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import { CalendarEventType } from '@/core/types/calendarTypes';
-import useEvents from '@/hooks/useEvents';
+import { useEvents } from '@/hooks/useEvents';
 
 interface EventsContextProps {
   events: CalendarEventType[];

@@ -4,8 +4,8 @@ import CalendarTable from "./ui/calendarTable";
 function TimelineCalendar() {
   return (
     <div className="w-full overflow-auto">
-        <CalendarHeader />
-        <CalendarTable />
+      <CalendarHeader />
+      <CalendarTable />
     </div>
   );
 }

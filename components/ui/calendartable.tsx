@@ -1,5 +1,5 @@
-import { CSSProperties, useCallback, useMemo } from 'react';
-import { add, addMinutes, format, isSameDay, parseISO } from 'date-fns';
+import { CSSProperties, useCallback, useMemo, useState } from 'react';
+import { addMinutes, eachDayOfInterval, endOfWeek, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
 import {
   Table,
   TableBody,
@@ -8,54 +8,89 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CalendarEventType, CalendarColorMap } from '@/core/types/calendarTypes';
+import { CalendarEventType } from '@/core/types/calendarTypes';
 import { useWeek } from '@/contexts/weekContext';
 import CalendarEvent from '@/components/ui/calendarEvent';
 import { v4 as uuidv4 } from 'uuid';
 import { useEventsContext } from '@/contexts/eventContext';
+import EventFormModal from './eventFormModal';
 
 function CalendarTable() {
-  const { weekStart, currentDay } = useWeek();
-  const { events, addEvent } = useEventsContext();
+  const { currentDay, weekStart } = useWeek();
+  const { events, addEvent, updateEvent, deleteEvent } = useEventsContext();
 
-  const daysOfWeek = useMemo(() => Array.from({ length: 7 }, (_, index) =>
-    add(weekStart, { days: index })
-  ), [weekStart]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEventType | null>(null);
+
+  let defaultEvent: CalendarEventType = {
+    id: uuidv4(),
+    title: '',
+    startDate: new Date(),
+    durationInMinutes: 60,
+    color: 'blue',
+  };
+
+  const openNewEventModal = useCallback((time: string, day: Date) => {
+    const newEvent = {
+      ...defaultEvent,
+      id: uuidv4(),
+      startDate: parseISO(`${format(day, 'yyyy-MM-dd')}T${time}`),
+    };
+    setSelectedEvent(newEvent);
+    setIsModalOpen(true);
+  }, []);
+
+  const openEditEventModal = (event: CalendarEventType) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveEvent = (eventData: CalendarEventType) => {
+    if (eventData.id && events.some(e => e.id === eventData.id)) {
+      updateEvent(eventData);
+    } else {
+      addEvent(eventData);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    deleteEvent(eventId);
+    setIsModalOpen(false);
+  };
+
+  const daysOfWeek = useMemo(() => eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart) }), [weekStart]);
 
   const timesOfDay = useMemo(() => Array.from({ length: 24 }, (_, index) => {
     return `${index.toString().padStart(2, '0')}:00`;
   }), []);
 
   const handleCellClick = useCallback((time: string, day: Date) => {
-    const newEvent: CalendarEventType = {
-      id: uuidv4(),
-      title: "New event",
-      startDate: parseISO(`${format(day, 'yyyy-MM-dd')}T${time}`),
-      durationInMinutes: Math.floor(Math.random() * 120) + 10,
-      color: Object.keys(CalendarColorMap)[Math.floor(Math.random() * 8)],
-    };
-
-    addEvent(newEvent);
-  }, [addEvent]);
-
+    openNewEventModal(time, day);
+  }, [openNewEventModal]);
 
   const getMinutesFromMidnight = (date: Date) => {
     return date.getHours() * 60 + date.getMinutes();
   };
 
+  const getTopOffset = (eventStartMinutes: number, cellStartMinutes: number) => {
+    return ((eventStartMinutes - cellStartMinutes) / 60) * 100;
+  };
+
+  const getHeight = (eventDurationInMinutes: number) => {
+    return (eventDurationInMinutes / 60) * 100;
+  };
+
   const getEventStyle = (event: CalendarEventType, events: CalendarEventType[], time: String): CSSProperties => {
     const eventStartMinutes = getMinutesFromMidnight(event.startDate);
     const cellStartMinutes = parseInt(time.split(':')[0]) * 60;
-    const topOffset = ((eventStartMinutes - cellStartMinutes) / 60) * 100;
-    const height = (event.durationInMinutes / 60) * 100;
-
     const { width, left } = getEventPositioning(event, events);
 
     return {
-      top: `${topOffset}%`,
+      top: `${getTopOffset(eventStartMinutes, cellStartMinutes) + 3}%`,
       left: `${left}%`,
       width: `${width}%`,
-      height: `${height}%`,
+      height: `${getHeight(event.durationInMinutes) - 6}%`,
       position: 'absolute',
     };
   };
@@ -74,14 +109,14 @@ function CalendarTable() {
     });
 
     const overlappingIndex = overlappingEvents.findIndex(e => e.id === event.id);
-
-    const width = (100 / overlappingEvents.length) * 0.9;
-    const left = width * overlappingIndex;
+    const gap = 1;
+    const width = ((100 / overlappingEvents.length) * 0.9) - 1.5 * gap;
+    const left = overlappingIndex * (width + 1.5 * gap) + gap;
 
     return { width, left };
-  };
+  }
 
-  return (
+  return (<>
     <Table className='bg-slate-50'>
       <TableHeader>
         <TableRow className='h-20 ' >
@@ -89,7 +124,7 @@ function CalendarTable() {
           {daysOfWeek.map(day => (
             <TableHead
               key={day.toString()}
-              className={isSameDay(day, currentDay) ? "text-blue-600 border-b font-bold" : "border-b"}
+              className={isSameDay(day, currentDay) ? "text-primary border-b font-bold" : "border-b"}
             >
               {format(day, 'EEEE')}
             </TableHead>
@@ -120,6 +155,7 @@ function CalendarTable() {
                         key={event.id}
                         event={event}
                         style={style}
+                        onEdit={openEditEventModal}
                       />
                     );
                   })
@@ -130,6 +166,14 @@ function CalendarTable() {
         ))}
       </TableBody>
     </Table>
+    <EventFormModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onSave={handleSaveEvent}
+      onDelete={handleDeleteEvent}
+      initialEvent={selectedEvent || defaultEvent}
+    />
+  </>
   );
 }
 

@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import { startOfWeek, endOfWeek, addWeeks, format, startOfDay } from 'date-fns';
 
 const WeekContext = createContext({
@@ -22,22 +22,39 @@ export const WeekProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentMonth, setCurrentMonth] = useState(weekEnd);
 
   const goToNextWeek = () => {
-    setWeekStart(current => addWeeks(current, 1));
+    setWeekStart(current => {
+      const newWeekStart = addWeeks(current, 1);
+      setCurrentMonth(newWeekStart);
+      return newWeekStart;
+    });
     setWeekEnd(current => addWeeks(current, 1));
-    setCurrentMonth(weekEnd);
   };
-
+  
   const goToDefinedDay = (date: Date) => {
-    setWeekStart(startOfWeek(date, { weekStartsOn: 1 }));
-    setWeekEnd(endOfWeek(date, { weekStartsOn: 1 }));
-    setCurrentDay(startOfDay(date));
-    setCurrentMonth(weekEnd);
+    const newWeekStart = startOfWeek(date, { weekStartsOn: 1 });
+    const newWeekEnd = endOfWeek(date, { weekStartsOn: 1 });
+
+    if (newWeekStart.getTime() !== weekStart.getTime() || newWeekEnd.getTime() !== weekEnd.getTime()) {
+      setWeekStart(newWeekStart);
+      setWeekEnd(newWeekEnd);
+    }
+
+    if (startOfDay(date).getTime() !== currentDay.getTime()) {
+      setCurrentDay(startOfDay(date));
+    }
+
+    if (newWeekEnd.getMonth() !== currentMonth.getMonth()) {
+      setCurrentMonth(newWeekEnd);
+    }
   };
 
   const goToPreviousWeek = () => {
-    setWeekStart(current => addWeeks(current, -1));
+    setWeekStart(current => {
+      const newWeekStart = addWeeks(current, -1);
+      setCurrentMonth(newWeekStart);
+      return newWeekStart;
+    });
     setWeekEnd(current => addWeeks(current, -1));
-    setCurrentMonth(weekEnd);
   };
 
   const goToToday = () => {
@@ -47,8 +64,13 @@ export const WeekProvider = ({ children }: { children: React.ReactNode }) => {
     setCurrentMonth(weekEnd);
   };
 
-  const formattedWeekRange = [`${format(weekStart, 'dd')} - ${format(weekEnd, 'dd')}`, format(weekEnd, 'MMM yyyy')];
+  const [formattedWeekRange, setFormattedWeekRange] = useState(['', '']);
 
+  useEffect(() => {
+    if (weekStart instanceof Date && weekEnd instanceof Date) {
+      setFormattedWeekRange([`${format(weekStart, 'dd')} - ${format(weekEnd, 'dd')}`, format(weekEnd, 'MMM yyyy')]);
+    }
+  }, [weekStart, weekEnd]);
 
   return (
     <WeekContext.Provider value={{ currentDay, currentMonth, weekStart, weekEnd, goToNextWeek, goToPreviousWeek, goToToday, goToDefinedDay, formattedWeekRange }}>
