@@ -82,14 +82,14 @@ function CalendarTable() {
   };
 
   return (
-    <Table>
+    <Table className='bg-slate-50'>
       <TableHeader>
-        <TableRow className='h-20' >
+        <TableRow className='h-20 ' >
           <TableHead className='min-w-[50] max-w-[80px]'></TableHead>
           {daysOfWeek.map(day => (
             <TableHead
               key={day.toString()}
-              className={isSameDay(day, currentDay) ? "text-blue-600 border-b" : "border-b"}
+              className={isSameDay(day, currentDay) ? "text-blue-600 border-b font-bold" : "border-b"}
             >
               {format(day, 'EEEE')}
             </TableHead>
@@ -99,7 +99,7 @@ function CalendarTable() {
       <TableBody>
         {timesOfDay.map(time => (
           <TableRow key={time} className='h-24'>
-            <TableCell className='align-top' ><p className='relative -top-2 font-medium text-muted-foreground'>{time}</p></TableCell>
+            <TableCell className='align-top' ><p className='relative -top-2 font-medium text-muted-foreground mx-4'>{time}</p></TableCell>
             {daysOfWeek.map(day => (
               <TableCell
                 key={day.toString()}

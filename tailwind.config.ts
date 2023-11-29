@@ -7,7 +7,7 @@ module.exports = {
     './app/**/*.{ts,tsx}',
     './core/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   theme: {
     container: {
       center: true,
@@ -51,6 +51,9 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+      },
+      fontSize: {
+        xxs: "0.625rem",
       },
       borderRadius: {
         lg: "var(--radius)",

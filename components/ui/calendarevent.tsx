@@ -37,6 +37,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({ event, style }) => {
     });
   };
 
+  const endDate = eventData.startDate ? new Date(eventData.startDate.getTime() + eventData.durationInMinutes * 60000) : new Date();
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleEventChange(e.target.name, new Date(e.target.value));
   }
@@ -112,13 +114,19 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({ event, style }) => {
     <>
       <div
         className={cn(
-          "absolute left-0 right-8 z-10 overflow-hidden bg-slate-800 hover:bg-slate-900 px-2 py-1 border-l-4 shadow-md hover:shadow-xl transition-all duration-200",
+          "flex flex-col truncate justify-between left-0 right-8 z-10 overflow-hidden bg-slate-800 hover:bg-slate-900 px-2 py-1 border-l-4 shadow-md hover:shadow-xl transition-all duration-200",
           CalendarColorMap[event.color]
         )}
         style={style}
         onClick={handleClick}
       >
         <div className='text-left text-neutral-100 font-semibold'>{event.title}</div>
+
+        <div className={`flex gap-1 ${eventData.durationInMinutes <= 30 ? 'hidden' : ''}`}>
+          <div className='text-left text-neutral-200 text-xxs'>{format(event.startDate, 'HH:mm')}</div>
+          <div className='text-left text-neutral-200 text-xxs'>-</div>
+          <div className='text-left text-neutral-200 text-xxs'>{format(endDate, 'HH:mm')}</div>
+        </div>
       </div>
 
       {isDialogOpen && (
@@ -128,7 +136,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({ event, style }) => {
               <DialogTitle className='mb-4'>Update your event</DialogTitle>
               <DialogDescription className='flex flex-col gap-6'>
                 <p className="grid w-full items-center gap-4">
-                  <Label htmlFor="title">Titlasdasde</Label>
+                  <Label htmlFor="title">Title</Label>
                   <Input
                     type="text"
                     id="title"
