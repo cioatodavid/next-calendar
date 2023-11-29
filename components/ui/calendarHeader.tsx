@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWeek } from '@/contexts/weekContext';
 import { Button } from './button';
-import { ChevronRight, ChevronLeft, CalendarDays } from "lucide-react"
+import { ChevronRight, ChevronLeft } from "lucide-react"
 
 
 const CalendarHeader = () => {

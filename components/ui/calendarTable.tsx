@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { CalendarEventType } from '@/core/types/calendarTypes';
 import { useWeek } from '@/contexts/weekContext';
-import CalendarEvent from '@/components/ui/calendarevent';
+import CalendarEvent from '@/components/ui/calendarEvent';
 import { v4 as uuidv4 } from 'uuid';
 import { useEventsContext } from '@/contexts/eventContext';
 import EventFormModal from './eventFormModal';

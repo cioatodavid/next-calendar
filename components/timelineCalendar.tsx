@@ -1,5 +1,5 @@
 import CalendarHeader from "./ui/calendarHeader";
-import CalendarTable from "./ui/calendartable";
+import CalendarTable from "./ui/calendarTable";
 
 function TimelineCalendar() {
   return (
