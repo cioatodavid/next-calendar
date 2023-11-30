@@ -3,7 +3,7 @@ import { Calendar } from "./ui/calendar";
 import { useWeek } from "@/contexts/weekContext";
 import { Button } from "./ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { CalendarClock, CalendarDays, CalendarSearch } from "lucide-react";
+import { CalendarClock, CalendarSearch } from "lucide-react";
 
 function SidebarCalendar() {
   const { goToDefinedDay, currentDay } = useWeek();

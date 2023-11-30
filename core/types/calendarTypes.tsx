@@ -21,7 +21,6 @@ export const CalendarColorMap: Record<string, string> = {
   pink: "border-l-pink-500",
   purple: "border-l-purple-500",
   gray: "border-l-gray-500",
-  neutral: "border-l-neutral-500",  
 };
 
 export const BGCalendarColorMap: Record<string, string> = {
@@ -33,7 +32,6 @@ export const BGCalendarColorMap: Record<string, string> = {
   pink: "bg-pink-200",
   purple: "bg-purple-200",
   gray: "bg-gray-200",
-  neutral: "bg-neutral-200",
 };
 
 export const BGCalendarColorMapHover: Record<string, string> = {
@@ -45,5 +43,4 @@ export const BGCalendarColorMapHover: Record<string, string> = {
   pink: "hover:bg-pink-300",
   purple: "hover:bg-purple-300",
   gray: "hover:bg-gray-300",
-  neutral: "hover:bg-neutral-300",
 };
