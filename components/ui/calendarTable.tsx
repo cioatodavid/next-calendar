@@ -59,8 +59,8 @@ function CalendarTable() {
     setIsModalOpen(false);
   };
 
-  const daysOfWeek = useMemo(() => eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart) }), [weekStart]);
-
+  const daysOfWeek = useMemo(() => eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart, { weekStartsOn: 1 }) }), [weekStart]); 
+  
   const timesOfDay = useMemo(() => Array.from({ length: 24 }, (_, index) => {
     return `${index.toString().padStart(2, '0')}:00`;
   }), []);
